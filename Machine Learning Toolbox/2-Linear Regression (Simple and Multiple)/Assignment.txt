@@ -1,0 +1,10 @@
+Assignment
+1. Use backward elimination to find the best fit linear regression model using the following datasets and show the predicted values on your validation and test sets.
+
+                                a. 50_StartUps
+
+                                b. your own dataset
+
+2. How did you create your validation and test sets?
+
+3.  Describe the steps that you followed to determine the best fit model for each dataset. 

@@ -1,0 +1,4 @@
+DT Assignment
+Calculate the entropy and information gain for each attribute 
+and complete the decision tree for the Tennis game dataset in 
+the powerpoint slides discussed in class.

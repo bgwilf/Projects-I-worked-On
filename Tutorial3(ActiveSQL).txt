@@ -1,0 +1,228 @@
+select c_name 
+from jmcust
+where  cname like 'Ms%';
+
+select surname, forenames
+from course, empcourse, employee
+where employee.empno = empcourse.empno, empcourse.courseno=course.courseno AND cname like '%Accounting%'
+
+TABLENAME	TABLETYPE
+-----------|--------
+course		TABLE
+department	TABLE
+empcourse	TABLE
+employee	TABLE
+jobhistory	TABLE
+
+
+employee:
+	EMPNO	SURNAME	FORENAMES	DOB			ADDRESS				TELNO			DEPNO
+			1	Jones	Elizabeth 	05-JAN-44	26 Agnews ter		212 337 2288		1
+		2	Smith	Robert		07-FEB-47	18 Marsh St, 		031 732 8972		1
+		
+JOBHIstory
+EMPNO	POSITION	STARTDATE	ENDDATE	SALARY
+1		Accounts Manager	12-JAN-76		30000
+1		Assistant Accounts Manager	11-FEB-72	12-JAN-76	22000
+
+
+COURSE:
+COURSENO	CNAME	CDATE
+1	Basic Accounting	11-JAN-89
+2	Further Accounting	25-JAN-89
+
+
+select * from empcourse
+EMPNO	COURSENO
+1		1
+1		2
+
+select * from department
+
+DEPNO	DNAME			LOCATION	HEAD
+1		accounts		floor 3		1
+2		administration	floor 2		1
+3		software design	floor 1		2
+4		communications	floor 4		3
+5		engineering		floor 5		7
+
+##############################
+
+1- List the full names of employees who have been on any Accounting course
+select distinct surname, forenames
+from course, empcourse, employee
+	where cname like '%Accounting%' 
+		AND	employee.empno = empcourse.empno 
+				AND empcourse.courseno=course.courseno;
+				
+2- Count the number of different employees who have been on any course
+select COUNT(distinct empno)as Count
+from empcourse
+
+3-List all employees by surname and forenames who have been on a course in 1988
+SELECT distinct surname, forenames
+from employee, empcourse, course
+where employee.empno=empcourse.empno 
+		AND empcourse.courseno=course.courseno 
+			and cdate between'01-Jan-1988' and '31-Dec-1988';
+			
+4-List in alphabetical order of department name then surname and then forename, the current position of all employees
+SELECT dname, surname, forenames, position
+FROM department,employee, jobhistory
+WHERE employee.empno=jobhistory.empno and employee.depno=department.depno and enddate IS NULL
+order  by dname,surname,forenames,position;
+
+5-Count the number of employees who have been on each course.
+select courseno, count(empno) as totalEmployee
+from empcourse 
+group by courseno;
+
+
+6-Count the number of employees in each of the departments numbered 3 to 5 inclusively
+select depno, count(empno) as total_Employee
+from employee
+where depno=3 or depno=4 or depno=5       ----->depno in (3,4,5)
+group by depno;
+
+
+7-List the average salary of current employees, grouped by department number.
+select depno, AVG(SALARY) as AverageSal
+from jobhistory, Employee
+where employee.empno= jobhistory.empno and enddate is NULL 
+Group by depno;
+
+8-List the number of jobs each employee has had within the company. Identify each employee by surname
+SELECT COUNT(position), surname
+FROM employee e, jobhistory j
+WHERE e.empno = j.empno
+GROUP BY surname; 
+
+<<elect count(position)
+from jobhistory, employee
+where employee.empno= jobhistory.empno
+group by jobhistory.empno;>>
+
+9-List the maximum and minimum salary of current employees and their department name, grouped by department.
+select dname, Max(SALARY) as salMax, Min(SALARY) as salMin
+from jobhistory, employee, department
+where employee.empno=jobhistory.empno 
+and employee.depno=department.depno 
+and enddate is null
+Group by dname
+
+
+
+10-List all the employees by surname and forenames who are in the same department as Matthew Brownlie.
+select surname, forenames
+from employee
+where depno =(select depno  
+               from employee
+                 where surname='Brownlie' AND forenames='Matthew') 
+AND surname!='Brownlie' 
+AND forenames!='Matthew'
+
+11-List the employee numbers and salary of all current employees who earn more than the employee number 16.
+ In each row show both the employee's salary and the salary of employee 16
+select h2.empno, h2.salary, (Select h1.salary
+from jobhistory h1
+where h1.empno=16 and h1.enddate is null)
+from jobhistory h2
+where h2.salary > (select h1.salary from jobhistory h1
+where h1.empno=16 and h1.enddate is null)
+and h2.enddate is null
+
+12- List the full names and positions of current employees who have been on any of the courses that 
+Robert Roberts has been on
+
+SELECT DISTINCT rest.surname, rest.forenames, position
+       FROM employee rest, empcourse restcourse, jobhistory
+       WHERE     restcourse.courseno IN            	
+      	 (SELECT RRcourse.courseno
+       	   FROM   employee RR, empcourse RRcourse
+               WHERE  RRcourse.empno = RR.empno  	
+               AND RR.surname = 'Roberts'
+               AND RR.forenames = 'Robert') 
+       AND rest.empno = restcourse.empno            	
+       AND NOT(rest.surname = 'Roberts'             
+                            AND rest.forenames = 'Robert')
+       AND rest.empno = jobhistory.empno            	
+       AND enddate is NULL;
+
+
+13-List the full names of any employee who started a new job on the same day as Allan Robinson.
+SELECT DISTINCT y.surname, y.forenames
+      FROM employee x, employee y, jobhistory s, jobhistory t
+      WHERE x.surname = 'Robinson'		-- Robinson’s job data
+      AND x.empno = s.empno
+      AND s.startdate = t.startdate		-- matching start dates
+      AND t.empno = y.empno 
+      AND y.empno != x.empno;		-- excluding Robinson himself
+
+
+<<[50%]
+select DISTINCT surname, forenames
+from employee, jobhistory
+where employee.empno= jobhistory.empno 
+and startdate IN (select startdate
+                   from jobhistory, employee
+                    where surname='Robinson' 
+                      AND forenames='Allan' 
+                        and employee.empno= jobhistory.empno 
+                          and enddate is null ) 
+and surname!='Robinson' 
+AND forenames!='Allan'
+and enddate is null>>
+
+
+14-List all employees by their full names with their positions who are in the same 
+department as Brian Murphy and are older than him.
+
+select surname, forenames, position
+from employee, jobhistory
+where employee.empno=jobhistory.empno
+and dob < (select dob
+from employee
+where surname='Murphy' and forenames='Brian Charles')
+and depno=(select depno
+from employee
+where surname='Murphy' and forenames='Brian Charles')
+and enddate is null
+
+
+
+
+15-List all employees by their full names who currently have the same salary as Claire 
+MacCallan, and order them alphabetically by surname.
+
+select surname, forenames
+from employee, jobhistory
+where enddate is null
+and employee.empno=jobhistory.empno
+and not(surname='MacCallan' and forenames='Claire')
+AND salary=
+(select salary
+from employee, jobhistory
+where employee.empno=jobhistory.empno
+and surname='MacCallan' and forenames='Claire'
+and enddate is null)
+Order by surname asc
+
+16-Convert the answer to question 15 to COUNT the occurences
+select COUNT(*)
+from employee, jobhistory
+where enddate is null
+and employee.empno=jobhistory.empno
+and not(surname='MacCallan' and forenames='Claire')
+AND salary=
+(select salary
+from employee, jobhistory
+where employee.empno=jobhistory.empno
+and surname='MacCallan' and forenames='Claire'
+and enddate is null)
+
+
+
+
+
+
+

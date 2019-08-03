@@ -1,0 +1,9 @@
+1-Create a view "secondview" which shows all employees who have an empno less than 5. In order to get a mark for this you must finish the queries with "select * from secondview".
+drop view secondview;
+create view secondview as 
+select empno from employee where empno < 5;
+select * from secondview;
+
+2-create a view which lists the number of courses each empno has been on, and confirm 
+this as being correct by executing "select * from viewname" on it as the last select 
+command of your SQL.

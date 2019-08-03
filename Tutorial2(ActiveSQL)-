@@ -1,0 +1,92 @@
+COSC631_Assignment 1(Tutorial2)- Gilles Wilfried Bassole
+
+1-List the employee number, position and salary of any employee who has been or is some sort of Analyst.
+select empno, position, salary
+from jobhistory
+where position LIKE '%Analyst%';
+
+2-List the employee number, position and salary of any employee who is an Analyst programmer.
+select empno, position, salary
+from jobhistory
+where position= 'Analyst Programmer' 
+AND endDate IS NULL;
+
+3-List the forenames and surname of all employees who are in department number 3
+select forenames, surname
+from employee
+where depno=3;
+
+4-List course numbers and employee numbers for all courses that employee numbers 7 and 14 have been on
+select courseno, empno
+from empcourse
+where (empno=7 or empno=14);
+
+5-Count the number of current Analyst Programmers
+Select Count(*)
+FROM jobhistory
+where position='Analyst Programmer' and enddate is NULL;
+
+6-Find the average salary of employees who hold the position of Accountant in the company.
+select AVG(salary)
+from jobhistory
+where position='Accountant' and enddate is null;
+
+7-Find the number of jobs employee 22 has had or has currently.
+select COUNT(*)
+from jobhistory
+where empno=22;
+
+8-Find the number of employees in department number 2.
+select COUNT(empno)
+from employee
+where depno=2;
+
+9-List the empno and position of any employee who's position includes the word 'Engineer'
+select empno, position
+from jobhistory
+where position LIKE '%Engineer%';
+
+10-List the empno of all employees who got a job or promotion in 1984
+select empno
+from jobhistory
+where startdate BETWEEN '01-Jan-1984' and '31-Dec-1984';
+
+11-What is the minimum salary currently?
+select Min(Salary)
+from jobhistory
+where enddate is null;
+
+12-List all the surnames of any employee who has an address in Edinburgh.
+select surname
+from employee
+where address like '%Edinburgh%';
+
+13-List the surname of any employee who does not have an e in their surname.
+select surname
+from employee
+where surname not like '%e%' and surname not like '%E%';
+
+14-Count the number of employee who has a forename starting with M or A 
+[x]
+Select Count(*)
+from employee
+where forenames like 'M%' or forenames like 'A%';
+[x]
+
+15-List the employee numbers and telephone numbers ordered by descending telephone number
+select empno, Telno
+from employee
+Order by empno DESC;
+
+16-Find all the distinct current jobs.
+select distinct position
+from jobhistory
+where enddate is null;
+
+17-Find all the distinct current salaries.
+select distinct salary
+from jobhistory
+where enddate is null;
+
+
+

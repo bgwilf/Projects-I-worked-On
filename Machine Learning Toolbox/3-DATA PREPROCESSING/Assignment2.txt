@@ -1,0 +1,9 @@
+Assignment #2
+Use any data set that has the following properties
+
+- at least 5 features where some of the features have categorical values,
+
+- has some missing values
+
+and write code that will pre-process the data to deal with missing values, scale the data, 
+and split the processed data into 75% training, 15 % validation and 10 % test sets.

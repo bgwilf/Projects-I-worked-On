@@ -1,0 +1,252 @@
+ABLENAME	TABLETYPE
+-----------|--------
+course		TABLE
+department	TABLE
+empcourse	TABLE
+employee	TABLE
+jobhistory	TABLE
+
+
+employee:
+	EMPNO	SURNAME	FORENAMES	DOB			ADDRESS				TELNO			DEPNO
+			1	Jones	Elizabeth 	05-JAN-44	26 Agnews ter		212 337 2288		1
+		2	Smith	Robert		07-FEB-47	18 Marsh St, 		031 732 8972		1
+		
+JOBHIstory
+EMPNO	POSITION	STARTDATE	ENDDATE	SALARY
+1		Accounts Manager	12-JAN-76		30000
+1		Assistant Accounts Manager	11-FEB-72	12-JAN-76	22000
+
+
+COURSE:
+COURSENO	CNAME	CDATE
+1	Basic Accounting	11-JAN-89
+2	Further Accounting	25-JAN-89
+
+
+select * from empcourse
+EMPNO	COURSENO
+1		1
+1		2
+
+select * from department
+
+DEPNO	DNAME			LOCATION	HEAD
+1		accounts		floor 3		1
+2		administration	floor 2		1
+3		software design	floor 1		2
+4		communications	floor 4		3
+5		engineering		floor 5		7
+
+
+##############################
+
+1-Use subqueries to list the surname of employees who have been on a course with employee 19.
+
+select distinct surname
+from employee, empcourse
+where employee.empno=empcourse.empno
+and employee.empno!=19
+AND courseno IN (select courseno
+from empcourse
+where empno=19)
+
+
+2-List the surname of those who earn less than the average salary of all staff.
+select surname
+from employee, jobhistory
+where employee.empno=jobhistory.empno
+and enddate is null
+and salary <(select AVG(salary) as AverageSalary
+from Jobhistory  where enddate is null)
+
+3-List the surname of employees who earn more than the average salary of employees who have jobs connected with Accounts.
+[ok]
+SELECT surname
+FROM employee e, jobhistory j
+WHERE e.empno = j.empno
+AND enddate IS NULL
+AND salary >
+               (SELECT AVG(salary)
+                FROM jobhistory
+                WHERE enddate IS NULL
+                AND position LIKE '%ccount%'); 
+
+[ok]
+select surname
+from jobhistory, employee
+where enddate is null
+and employee.empno = jobhistory.empno
+and salary >
+( select AVG(salary) as AverageSalary
+from jobhistory, employee
+where enddate is null and employee.empno = jobhistory.empno 
+and depno =(select depno
+from department
+where dname='accounts') )
+
+
+4-List the surname and forenames of employees who earn more than any employee connected to Admin
+[ok]
+SELECT surname, forenames
+FROM employee e, jobhistory j
+WHERE e.empno = j.empno
+AND salary > ANY
+               (SELECT salary
+                FROM jobhistory
+                WHERE enddate IS NULL
+                AND position LIKE '%dmin%')
+       AND enddate IS NULL; 
+[ok]
+
+select surname, forenames
+from jobhistory, employee
+where employee.empno = jobhistory.empno
+and enddate is null 
+and salary > any
+( select salary
+from jobhistory, employee
+where enddate is null AND employee.empno = jobhistory.empno 
+and depno =(select depno
+from department
+where dname='administration') )
+
+5-List the surname and position of employees earning less than everyone in department 3
+SELECT surname, position
+FROM employee e, jobhistory j
+WHERE e.empno = j.empno
+AND salary < ALL
+               (SELECT salary
+                FROM jobhistory, employee
+                WHERE enddate IS NULL
+                AND jobhistory.empno = employee.empno
+                AND depno = 3)
+      AND enddate IS NULL; 
+
+
+6-List the surname of employees who has been on a course which employee number 14 has not been on
+
+select distinct surname 
+from employee, empcourse
+where employee.empno=empcourse.empno
+and courseno NOT IN
+(select distinct courseno
+from empcourse
+where empno =14)
+
+7-List the surname of employees who are currently doing a unique job.
+SELECT surname
+FROM employee e, jobhistory s
+WHERE e.empno = s.empno
+AND s.enddate IS NULL
+AND NOT EXISTS
+               (SELECT *
+                FROM jobhistory t
+                WHERE t.enddate IS NULL
+                AND t.position = s.position
+                AND s.empno != t.empno); 
+
+
+8-List the surname of employees who have done or are doing any job which employee 
+23 has done or is doing. Include the surname of employee 23.
+
+SELECT DISTINCT surname
+FROM employee e, jobhistory s
+WHERE e.empno = s.empno
+AND s.position IN
+               (SELECT t.position
+                FROM jobhistory t
+                WHERE t.empno = 23);
+
+9-List the course names of courses which employees from department number 2 have been on.
+
+SELECT DISTINCT cname
+FROM course c, empcourse ec, employee e
+WHERE e.empno = ec.empno
+AND ec.courseno = c.courseno
+AND e.empno IN
+               (SELECT empno
+                FROM employee
+                WHERE depno = 2); 
+
+
+10- List the employee surname, forenames, and course for each time an employee 
+attended a course at which no other colleague was present.
+
+SELECT  surname, forenames, cname	
+       FROM     employee empx, course coursex, empcourse
+       WHERE  empcourse.empno = empx.empno
+       AND        empcourse.courseno = coursex.courseno
+       AND        NOT EXISTS
+                        (   SELECT * 			
+                            FROM     employee restemp, course restcourse, empcourse
+                            WHERE  empcourse.empno = restemp.empno 
+                            AND         empcourse.courseno = restcourse.courseno  
+                            AND         empx.empno != restemp.empno
+                            AND         restcourse.courseno = coursex.courseno);
+       
+11-List the full names and positions of employees who have been on any of the courses that 
+Robert Roberts has been on. Use subselect.
+SELECT DISTINCT rest.surname, rest.forenames, position
+       FROM employee rest, empcourse restcourse, jobhistory
+						
+       WHERE     restcourse.courseno IN            	
+      	 (SELECT RRcourse.courseno
+       	   FROM   employee RR, empcourse RRcourse
+               WHERE  RRcourse.empno = RR.empno  	
+               AND RR.surname = 'Roberts'
+               AND RR.forenames = 'Robert') 
+       AND rest.empno = restcourse.empno            	
+       AND NOT(rest.surname = 'Roberts'             	 
+                            AND rest.forenames = 'Robert')
+       AND rest.empno = jobhistory.empno            	
+       AND enddate is NULL;
+
+12-List the employee numbers and telephone numbers of all staff in department 3 or 1. 
+Make use of UNION.
+
+select empno, telno
+from employee
+where depno=3
+Union
+select empno, telno
+from employee
+where depno=1
+
+13-	List the employee number of the head of department 4 and 
+the employee numbers of all staff in department 4 in a single table using union.
+select Head
+from department
+where depno=4
+UNION
+select empno
+from employee
+where depno=4
+
+14-List the full name of everyone living in Edinburgh 
+or who is in accounts. Perform this task using UNION.
+SELECT surname, forenames
+ FROM  employee
+ WHERE address LIKE '%dinburgh%'
+ UNION
+ SELECT surname , forenames
+ FROM employee, jobhistory
+ WHERE position LIKE '%ccount%'
+ AND employee.empno = jobhistory.empno
+ AND enddate IS NULL;
+
+15-Write a query which shows which empno has been to the most courses. List the empno and the number of courses that person has been on. There may be multiple employees with the biggest count.
+SELECT empno, count(courseno) 
+FROM empcourse
+GROUP BY empno
+HAVING count(courseno)= (select max(count(*)) from empcourse group by empno  )
+
+16-Write a query which shows which employee has had the most jobs with the company. There may be multiple employees with the biggest job count. Show the surname,forename, and the job count in your answer. You will have to GROUP BY two columns (e.g. GROUP BY x,y).
+
+select surname, forenames, count(position)
+from employee, jobhistory
+where employee.empno=jobhistory.empno
+having count(position)=(select max(count(*))
+from jobhistory 
+group by empno)
+group by surname, forenames

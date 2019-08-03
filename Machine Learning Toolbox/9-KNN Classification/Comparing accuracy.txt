@@ -1,0 +1,6 @@
+Assignment
+Comparing accuracy
+Compare Precision, Misclassification Rate and Accuracy 
+for the different classifiers (Logistic Regression, 
+Decision tree, Random forest, KNN, SVM-Linear and SVM-RBF) 
+on Social_Networks_Ads dataset.

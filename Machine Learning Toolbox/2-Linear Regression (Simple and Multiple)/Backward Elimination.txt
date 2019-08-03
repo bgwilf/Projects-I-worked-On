@@ -1,0 +1,4 @@
+Backward Elimination
+Attached Files:
+File backward_elimination_part.py (1.599 KB)
+https://www.statsmodels.org/dev/generated/statsmodels.regression.linear_model.OLS.html
