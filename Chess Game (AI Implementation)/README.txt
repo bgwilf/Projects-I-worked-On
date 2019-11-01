@@ -1,26 +1,5 @@
 ChessAI
-
-by Sidharth Shanker
 ----------------------------------------------------------------------------------
-FILES CONTAINED:
-
-/src/AI.java
-/src/Bishop.java
-/src/Board.java
-/src/CaptainRandom.java
-/src/Game.java
-/src/King.java
-/src/Knight.java
-/src/MainClass.java
-/src/MinMax.java
-/src/Move.java
-/src/Pawn.java
-/src/Piece.java
-/src/Queen.java
-/src/Rook.java
-/src/View.java
-
-/doc/ -- Javadoc is stored here
 
 Note that all images came from Wikimedia and are free to be distributed
 See JavaDoc and code documentation for descriptions of these different classes.
@@ -46,5 +25,25 @@ Finally, I have defined an AI interface that allows a user to define an AI gener
 Enjoy playing my chess game!
 
 Note: For the sake of color of pieces in this game, I have chosen to use boolean values where false is white and true is black.  
+
+FILES CONTAINED:
+
+/src/AI.java(GWB)
+/src/Bishop.java(Sidharth Shanker)
+/src/Board.java (by SS)
+/src/CaptainRandom.java(by SS)
+/src/Game.java(by SS)
+/src/King.java(by SS)
+/src/Knight.java(by SS)
+/src/MainClass.java (GWB & SS)
+/src/MinMax.java(GWB)
+/src/Move.java(by SS)
+/src/Pawn.java(by SS)
+/src/Piece.java(by SS)
+/src/Queen.java(by SS)
+/src/Rook.java(by SS)
+/src/View.java(by SS)
+
+/doc/ -- Javadoc is stored here
 
 
